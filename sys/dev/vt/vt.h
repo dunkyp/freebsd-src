@@ -157,6 +157,7 @@ struct vt_device {
 #define	VDF_MOUSECURSOR	0x40	/* Mouse cursor visible. */
 #define	VDF_QUIET_BELL	0x80	/* Disable bell. */
 #define	VDF_SUSPENDED	0x100	/* Device has been suspended. */
+#define	VDF_BLANKED	0x200	/* Splash screen active. */
 #define	VDF_DOWNGRADE	0x8000	/* The driver is being downgraded. */
 	struct keyboard		*vd_keyboard;	/* (G) Keyboard. */
 	unsigned int		 vd_kbstate;	/* (?) Device unit. */

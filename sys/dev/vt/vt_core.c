@@ -1483,6 +1483,12 @@ vt_flush(struct vt_device *vd)
 	if (vd->vd_flags & VDF_SPLASH || vw->vw_flags & VWF_BUSY)
 		return (0);
 
+	if (vd->vd_flags & VDF_BLANKED) {
+                vd->vd_flags &= ~VDF_BLANKED;
+		vd->vd_flags |=	VDF_INVALID;
+		return (0);
+        }
+
 	vf = vw->vw_font;
 	if (((vd->vd_flags & VDF_TEXTMODE) == 0) && (vf == NULL))
 		return (0);
@@ -1690,6 +1696,14 @@ vtterm_splash(struct vt_device *vd)
 	}
 }
 #endif
+
+static void
+vtterm_blank(struct vt_device *vd)
+{
+        const teken_attr_t *a = teken_get_curattr(&vd->vd_curwindow->vw_terminal->tm_emulator);
+        vd->vd_flags |= VDF_BLANKED;
+        vd->vd_driver->vd_blank(vd, a->ta_bgcolor);
+}
 
 static struct vt_font *
 parse_font_info_static(struct font_info *fi)
@@ -2759,7 +2773,7 @@ skip_thunk:
 			return (vd->vd_driver->vd_fb_ioctl(vd, cmd, data, td));
 		break;
 	case CONS_BLANKTIME:
-		/* XXX */
+                vtterm_blank(vd);
 		return (0);
 	case CONS_HISTORY:
 		if (*(int *)data < 0)
